@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1789407110215,
+      "tag": "0000_striped_mojo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1789407160638,
+      "tag": "0001_nappy_veda",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1790326834947,
+      "tag": "0002_misty_roulette",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1790924400000,
+      "tag": "0004_operation_leases",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { build } from "esbuild";
+const bundle=await build({entryPoints:["src-ui/demo-api.ts"],bundle:true,format:"esm",platform:"node",write:false,define:{"import.meta.env.VITE_DEMO":'"true"'}});
+const data=new Map();
+globalThis.localStorage={getItem:k=>data.get(k)||null,setItem:(k,v)=>data.set(k,v)};
+globalThis.fetch=()=>{throw new Error("Demo must never call a live API")};
+const {demoRequest:api,resetDemo}=await import("data:text/javascript;base64,"+Buffer.from(bundle.outputFiles[0].text).toString("base64"));
+const write=(method,body)=>({method,body:JSON.stringify(body)});
+test("demo supports job creation, decisions, edits, deletion and reset without network access",async()=>{
+ resetDemo();assert.equal((await api("/api/jobs")).jobs.length,6);
+ const draft={title:"Sample analyst",company:"Example",description:"Fictional role",lane_hint:"bizops",location:"Remote",status:"new"};
+ const result=await api("/api/jobs/ingest",write("POST",draft));
+ await api("/api/jobs/"+result.job_id+"/status",write("POST",{status:"applied"}));
+ assert.equal((await api("/api/jobs/"+result.job_id)).status,"applied");
+ assert.equal((await api("/api/jobs/ingest",write("POST",draft))).created,false);
+ assert.equal((await api("/api/jobs/"+result.job_id)).status,"applied");
+ await api("/api/jobs/"+result.job_id,{method:"DELETE"});
+ assert.equal((await api("/api/jobs")).jobs.length,6);
+ assert.ok(data.size);
+ await assert.rejects(api("/api/jobs/northstar/analyze",write("POST",{})),/private installation/);
+ resetDemo();assert.equal((await api("/api/jobs/northstar")).status,"ready_to_apply");
+});
+test("networking changes and reset stay in the demo browser store",async()=>{
+ resetDemo();
+ await api("/api/networking/companies/harbor/contacts",write("POST",{contacts:[{name:"Example Contact",linkedin_url:""}]}));
+ let c=await api("/api/networking/companies/harbor");
+ assert.equal(c.contacts.length,1);
+ await api("/api/networking/contacts/"+c.contacts[0].contact_id,write("PATCH",{responded:true}));
+ assert.equal((await api("/api/networking/companies/harbor")).status,"conversation_active");
+ resetDemo();assert.equal((await api("/api/networking/companies/harbor")).contacts.length,0);
+});

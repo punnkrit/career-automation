@@ -1,0 +1,30 @@
+[project]
+name = "career-automation"
+version = "0.1.0"
+description = "Personal Codex-driven career automation workflow"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "python-docx>=1.1.2",
+  "PyYAML>=6.0.2",
+  "requests>=2.32.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.2.0", "httpx2>=0.28.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+career = "career_workflow.cli:main"
+career-worker = "career_workflow.worker:main"
+
+[tool.setuptools.packages.find]
+include = ["career_workflow*"]

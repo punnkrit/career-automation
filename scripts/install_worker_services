@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+ROOT_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
+API_UNIT="career-automation-api.service"
+TUNNEL_UNIT="career-automation-tunnel.service"
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/install_worker_services [--render-only DIRECTORY]
+
+Render portable systemd user units from this repository's absolute path.
+Without --render-only, install and enable them for the current WSL user.
+EOF
+}
+
+die() {
+  echo "worker service installer: $*" >&2
+  exit 1
+}
+
+unit_quote() {
+  local value="$1"
+  [[ "$value" != *$'\n'* && "$value" != *$'\r'* ]] || die "paths containing newlines are not supported"
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  value="${value//%/%%}"
+  printf '"%s"' "$value"
+}
+
+unit_path() {
+  local LC_ALL=C
+  local value="$1"
+  local output=""
+  local character
+  local code
+  local index
+  [[ "$value" == /* ]] || die "systemd paths must be absolute"
+  [[ "$value" != *$'\n'* && "$value" != *$'\r'* ]] || die "paths containing newlines are not supported"
+  for ((index = 0; index < ${#value}; index++)); do
+    character="${value:index:1}"
+    case "$character" in
+      [a-zA-Z0-9/_.:+-]) output+="$character" ;;
+      '%') output+='%%' ;;
+      *)
+        printf -v code '%02x' "'$character"
+        output+="\\x$code"
+        ;;
+    esac
+  done
+  printf '%s' "$output"
+}
+
+append_path() {
+  local candidate="$1"
+  [[ -n "$candidate" ]] || return
+  case ":$SERVICE_PATH:" in
+    *":$candidate:"*) ;;
+    *) SERVICE_PATH="${SERVICE_PATH:+$SERVICE_PATH:}$candidate" ;;
+  esac
+}
+
+render_only=0
+render_dir=""
+if [[ $# -gt 0 ]]; then
+  if [[ "$1" == "--render-only" && $# -eq 2 ]]; then
+    render_only=1
+    render_dir="$2"
+  else
+    usage >&2
+    exit 2
+  fi
+fi
+
+python_path="$ROOT_DIR/.venv/bin/python"
+[[ -x "$python_path" ]] || die "missing $python_path; run scripts/worker setup first"
+[[ -x "$ROOT_DIR/scripts/run_worker_tunnel" ]] || die "scripts/run_worker_tunnel is not executable"
+
+SERVICE_PATH=""
+append_path "$ROOT_DIR/.venv/bin"
+for command_name in codex cloudflared; do
+  command_path="$(command -v -- "$command_name" 2>/dev/null || true)"
+  if [[ "$command_path" == */* ]]; then
+    append_path "$(cd -- "$(dirname -- "$command_path")" && pwd -P)"
+  fi
+done
+append_path "$HOME/.local/bin"
+append_path "$HOME/.cargo/bin"
+append_path "$HOME/bin"
+for standard_path in /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin; do
+  append_path "$standard_path"
+done
+
+if [[ $render_only -eq 1 ]]; then
+  mkdir -p -- "$render_dir"
+else
+  command -v systemctl >/dev/null 2>&1 || die "systemctl is unavailable; enable systemd in WSL first"
+  render_dir="$HOME/.config/systemd/user"
+  mkdir -p -- "$render_dir"
+fi
+
+root_path="$(unit_path "$ROOT_DIR")"
+env_path="$(unit_path "$ROOT_DIR/.env")"
+python_q="$(unit_quote "$python_path")"
+tunnel_script_q="$(unit_quote "$ROOT_DIR/scripts/run_worker_tunnel")"
+path_q="$(unit_quote "PATH=$SERVICE_PATH")"
+
+{
+  printf '%s\n' \
+    '[Unit]' \
+    'Description=Career Automation optional Codex worker API' \
+    'Wants=network-online.target' \
+    'After=network-online.target' \
+    '' \
+    '[Service]' \
+    'Type=simple' \
+    "WorkingDirectory=$root_path" \
+    "EnvironmentFile=$env_path" \
+    "Environment=$path_q" \
+    "ExecStart=$python_q -m uvicorn career_workflow.api:app --host 127.0.0.1 --port 8010" \
+    'Restart=on-failure' \
+    'RestartSec=3s' \
+    'TimeoutStopSec=30s' \
+    '' \
+    '[Install]' \
+    'WantedBy=default.target'
+} > "$render_dir/$API_UNIT"
+
+{
+  printf '%s\n' \
+    '[Unit]' \
+    'Description=Career Automation Cloudflare tunnel' \
+    "Wants=network-online.target $API_UNIT" \
+    "After=network-online.target $API_UNIT" \
+    '' \
+    '[Service]' \
+    'Type=simple' \
+    "WorkingDirectory=$root_path" \
+    "EnvironmentFile=$env_path" \
+    "Environment=$path_q" \
+    "ExecStart=$tunnel_script_q" \
+    'Restart=always' \
+    'RestartSec=5s' \
+    'TimeoutStopSec=30s' \
+    '' \
+    '[Install]' \
+    'WantedBy=default.target'
+} > "$render_dir/$TUNNEL_UNIT"
+
+if [[ $render_only -eq 1 ]]; then
+  printf 'Rendered %s and %s in %s\n' "$API_UNIT" "$TUNNEL_UNIT" "$render_dir"
+  exit 0
+fi
+
+systemctl --user daemon-reload
+systemctl --user enable "$API_UNIT" "$TUNNEL_UNIT"
+printf 'Installed and enabled %s and %s.\n' "$API_UNIT" "$TUNNEL_UNIT"
+printf 'Start them with: %s/scripts/worker start\n' "$ROOT_DIR"

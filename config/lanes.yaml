@@ -1,0 +1,99 @@
+lanes:
+  ai_solutions:
+    label: AI Solutions / AI Implementation
+    priority: 1
+    target_titles:
+      - AI Solutions Consultant
+      - AI Implementation Manager
+      - Forward Deployed Engineer
+      - Enterprise AI Consultant
+      - AI Workflow Automation Lead
+      - Solutions Product Manager
+    queries:
+      - AI Solutions Consultant
+      - AI Implementation Manager
+      - Enterprise AI Consultant
+      - AI Workflow Automation Lead
+      - Forward Deployed Engineer
+    positioning: "Translate messy business workflows, documents, and operational decisions into usable AI-enabled systems."
+  product_ops:
+    label: Product Operations / Product Strategy / Product Analytics
+    priority: 2
+    target_titles:
+      - Product Operations Manager
+      - Product Strategy Manager
+      - Product Analyst
+      - Product Analytics Manager
+      - Strategy & Operations Manager Product
+    queries:
+      - Product Operations Manager
+      - Product Strategy Manager
+      - Product Analytics Manager
+      - Strategy Operations Product
+    positioning: "Improve product execution and product quality using analytics, workflow design, and measurable decision systems."
+  bizops:
+    label: Strategy & Operations / BizOps
+    priority: 3
+    target_titles:
+      - Strategy & Operations Manager
+      - Business Operations Manager
+      - BizOps Manager
+      - GTM Strategy Manager
+      - Growth Strategy Manager
+    queries:
+      - Strategy Operations Manager
+      - Business Operations Manager Tech
+      - BizOps Manager
+      - GTM Strategy Manager AI
+    positioning: "Use analytics, operating models, and structured problem solving to improve business decisions and execution."
+  tpm_epm:
+    label: TPM / EPM / AI Program Manager
+    priority: 4
+    target_titles:
+      - Technical Program Manager AI
+      - Technical Program Manager Data
+      - Engineering Program Manager
+      - Program Manager AI Operations
+      - Search Program Manager
+    queries:
+      - Technical Program Manager AI
+      - Technical Program Manager Data
+      - Program Manager AI Operations
+      - Engineering Program Manager Data
+    positioning: "Coordinate analytical and product-quality execution across ambiguous technical and business systems."
+  ai_product:
+    label: AI Product Manager / Product Manager
+    priority: 5
+    target_titles:
+      - Product Manager AI
+      - Product Manager Internal Tools
+      - Product Manager Search
+      - Product Manager Data Products
+      - Product Manager Workflow Automation
+    queries:
+      - Product Manager AI
+      - Product Manager Internal Tools
+      - Product Manager Data Products
+      - Product Manager Workflow Automation
+    positioning: "Bring product sense, analytics, and AI workflow understanding to products that improve decisions and workflows."
+  pmm_gtm_ai:
+    label: PMM / GTM AI
+    priority: 6
+    target_titles:
+      - Product Marketing Manager AI
+      - GTM Strategy Manager AI
+      - Solutions Marketing Manager
+      - AI Commercialization Manager
+    queries:
+      - Product Marketing Manager AI
+      - GTM Strategy Manager AI
+      - Solutions Marketing Manager AI
+    positioning: "Translate AI product capabilities into clear customer, business, and adoption value."
+excluded_patterns:
+  - pure software engineering
+  - pure data scientist
+  - machine learning researcher
+  - extensive sales quota ownership
+  - generic low-level operations
+  - citizenship required
+  - active security clearance

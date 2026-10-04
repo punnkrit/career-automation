@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+die() {
+  echo "worker tunnel: $*" >&2
+  exit 1
+}
+
+expand_home() {
+  local value="$1"
+  if [[ "$value" == "~/"* ]]; then
+    printf '%s/%s' "$HOME" "${value#~/}"
+  else
+    printf '%s' "$value"
+  fi
+}
+
+cloudflared_command="${CAREER_CLOUDFLARED_COMMAND:-cloudflared}"
+if [[ "$cloudflared_command" == */* ]]; then
+  cloudflared_command="$(expand_home "$cloudflared_command")"
+  [[ -x "$cloudflared_command" ]] || die "CAREER_CLOUDFLARED_COMMAND is not executable."
+else
+  cloudflared_command="$(command -v -- "$cloudflared_command" || true)"
+  [[ -n "$cloudflared_command" ]] || die "cloudflared was not found on PATH."
+fi
+
+# A token file is preferred to a plaintext token because it stays out of the
+# process argument list. Unset a simultaneous token so cloudflared honors the
+# explicitly selected file.
+if [[ -n "${TUNNEL_TOKEN_FILE:-}" ]]; then
+  token_file="$(expand_home "$TUNNEL_TOKEN_FILE")"
+  [[ -r "$token_file" ]] || die "TUNNEL_TOKEN_FILE is not readable."
+  unset TUNNEL_TOKEN
+  exec "$cloudflared_command" tunnel run --token-file "$token_file"
+fi
+
+if [[ -n "${TUNNEL_TOKEN:-}" ]]; then
+  # cloudflared reads TUNNEL_TOKEN from the environment. Passing it as --token
+  # would expose the credential in the process list.
+  exec "$cloudflared_command" tunnel run
+fi
+
+if [[ -n "${CAREER_TUNNEL_ID:-}" ]]; then
+  [[ -n "${TUNNEL_CRED_FILE:-}" ]] || die "CAREER_TUNNEL_ID also requires TUNNEL_CRED_FILE."
+  credential_file="$(expand_home "$TUNNEL_CRED_FILE")"
+  [[ -r "$credential_file" ]] || die "TUNNEL_CRED_FILE is not readable."
+  origin_url="${TUNNEL_URL:-http://127.0.0.1:8010}"
+  exec "$cloudflared_command" tunnel run \
+    --credentials-file "$credential_file" \
+    --url "$origin_url" \
+    "$CAREER_TUNNEL_ID"
+fi
+
+if [[ -n "${TUNNEL_CRED_FILE:-}" ]]; then
+  die "TUNNEL_CRED_FILE also requires CAREER_TUNNEL_ID."
+fi
+
+if [[ -n "${CAREER_TUNNEL_CONFIG:-}" ]]; then
+  tunnel_config="$(expand_home "$CAREER_TUNNEL_CONFIG")"
+else
+  tunnel_config="$HOME/.cloudflared/career-automation.yml"
+fi
+[[ -r "$tunnel_config" ]] || die "No tunnel token, credentials pair, or readable tunnel config was found."
+
+exec "$cloudflared_command" tunnel --config "$tunnel_config" run

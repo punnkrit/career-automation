@@ -1,0 +1,125 @@
+metros:
+  bay_area:
+    label: The Bay Area
+    description: Core San Francisco Bay Area hiring markets, searched from San Francisco with pagination.
+    search_locations:
+      - San Francisco, California, United States
+    edge_locations:
+      - San Jose, California, United States
+      - Oakland, California, United States
+    locations:
+      - San Francisco, California, United States
+      - San Jose, California, United States
+      - Oakland, California, United States
+      - Palo Alto, California, United States
+      - Mountain View, California, United States
+      - Sunnyvale, California, United States
+      - Santa Clara, California, United States
+      - Cupertino, California, United States
+      - Menlo Park, California, United States
+      - Redwood City, California, United States
+      - San Mateo, California, United States
+      - South San Francisco, California, United States
+      - Fremont, California, United States
+      - Berkeley, California, United States
+      - Emeryville, California, United States
+  greater_la:
+    label: Greater LA Metro Area
+    description: Los Angeles, Orange County, and nearby tech/media hiring centers.
+    search_locations:
+      - Los Angeles, California, United States
+    edge_locations:
+      - Irvine, California, United States
+      - Long Beach, California, United States
+    locations:
+      - Los Angeles, California, United States
+      - Santa Monica, California, United States
+      - Culver City, California, United States
+      - Beverly Hills, California, United States
+      - Pasadena, California, United States
+      - Glendale, California, United States
+      - Burbank, California, United States
+      - Long Beach, California, United States
+      - El Segundo, California, United States
+      - Irvine, California, United States
+      - Anaheim, California, United States
+      - Costa Mesa, California, United States
+  seattle_tacoma:
+    label: Seattle-Tacoma
+    description: Seattle, Eastside, and South Sound hiring markets, searched from Seattle with pagination.
+    search_locations:
+      - Seattle, Washington, United States
+    edge_locations:
+      - Tacoma, Washington, United States
+      - Everett, Washington, United States
+    locations:
+      - Seattle, Washington, United States
+      - Bellevue, Washington, United States
+      - Redmond, Washington, United States
+      - Kirkland, Washington, United States
+      - Renton, Washington, United States
+      - Tacoma, Washington, United States
+      - Bothell, Washington, United States
+      - Everett, Washington, United States
+  boston:
+    label: Boston
+    description: Boston and close Cambridge-area technology and business hubs.
+    search_locations:
+      - Boston, Massachusetts, United States
+    edge_locations:
+      - Cambridge, Massachusetts, United States
+      - Waltham, Massachusetts, United States
+    locations:
+      - Boston, Massachusetts, United States
+      - Cambridge, Massachusetts, United States
+      - Somerville, Massachusetts, United States
+      - Brookline, Massachusetts, United States
+      - Waltham, Massachusetts, United States
+      - Newton, Massachusetts, United States
+      - Burlington, Massachusetts, United States
+  nyc:
+    label: New York City
+    description: NYC plus close New Jersey commuter-market cities.
+    search_locations:
+      - New York, New York, United States
+    edge_locations:
+      - Jersey City, New Jersey, United States
+      - Newark, New Jersey, United States
+    locations:
+      - New York, New York, United States
+      - Brooklyn, New York, United States
+      - Queens, New York, United States
+      - Jersey City, New Jersey, United States
+      - Hoboken, New Jersey, United States
+      - Newark, New Jersey, United States
+      - Weehawken, New Jersey, United States
+      - Long Island City, New York, United States
+  chicago:
+    label: Chicago
+    description: Chicago and nearby inner-suburb business centers.
+    search_locations:
+      - Chicago, Illinois, United States
+    edge_locations:
+      - Naperville, Illinois, United States
+      - Schaumburg, Illinois, United States
+    locations:
+      - Chicago, Illinois, United States
+      - Evanston, Illinois, United States
+      - Oak Brook, Illinois, United States
+      - Schaumburg, Illinois, United States
+      - Naperville, Illinois, United States
+  denver:
+    label: Denver
+    description: Denver, Boulder, and nearby Front Range hiring markets.
+    search_locations:
+      - Denver, Colorado, United States
+    edge_locations:
+      - Boulder, Colorado, United States
+      - Aurora, Colorado, United States
+    locations:
+      - Denver, Colorado, United States
+      - Boulder, Colorado, United States
+      - Broomfield, Colorado, United States
+      - Westminster, Colorado, United States
+      - Aurora, Colorado, United States
+      - Englewood, Colorado, United States

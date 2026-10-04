@@ -1,0 +1,138 @@
+/* Shared job workspace: narrow screens are a complete one-pane experience. */
+.workspace > *, .job-list-pane, .job-list-pane > *, .job-filters { min-width: 0; }
+.job-list-pane { display: grid; gap: 16px; align-content: start; }
+.workspace.job-workspace.split.resizable,
+.workspace.job-workspace.split.resizable.details-collapsed { grid-template-columns: minmax(0, 1fr); }
+.job-detail-surface {
+  color: var(--text); background: var(--surface); border: 0; padding: 0; margin: 0;
+  position: fixed; inset: 0; width: 100%; max-width: none;
+  height: 100dvh; max-height: 100dvh; overflow: auto; overscroll-behavior: contain;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.job-detail-surface::backdrop { background: var(--surface); }
+.job-detail-surface > .inspector { position: static; max-height: none; overflow: visible; border: 0; border-radius: 0; }
+.job-detail-surface .inspector-collapse-button { display: none; }
+.mobile-detail-header {
+  position: sticky; top: 0; z-index: 3; display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.mobile-detail-header > span { color: var(--muted); font-size: 13px; }
+.mobile-detail-header button { min-height: 44px; }
+.detail-message { padding: 24px; }
+.detail-skeleton { height: 80px; margin-top: 20px; border-radius: 6px; background: var(--surface-2); }
+.job-cards { display: grid; gap: 12px; min-width: 0; }
+.job-card { min-width: 0; border: 1px solid var(--border); background: var(--surface); border-radius: 8px; overflow: hidden; }
+.job-card.selected { border-color: var(--accent); }
+.job-card-open { display: grid; width: 100%; text-align: left; justify-content: stretch; gap: 10px; padding: 16px; border: 0; border-radius: 0; }
+.job-card-open > strong { font-size: 17px; line-height: 1.35; overflow-wrap: anywhere; }
+.job-card-eyebrow, .job-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--muted); }
+.job-card-eyebrow > span { overflow-wrap: anywhere; }
+.job-card-location { font-size: 13px; color: var(--muted); line-height: 1.5; overflow-wrap: anywhere; }
+.job-card-facts { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; }
+.job-card-facts > span { background: var(--surface-2); padding: 5px 8px; border-radius: 4px; }
+.job-card-footer { align-items: flex-end; line-height: 1.5; }
+.job-card-footer > span:last-child { flex-shrink: 0; color: var(--accent); font-weight: 600; }
+.job-card-actions { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-top: 1px solid var(--border); }
+.job-card-actions a { margin-left: auto; min-height: 44px; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+.job-card-actions .role-copy-button { width: 44px; min-width: 44px; min-height: 44px; }
+.mobile-select-all, .mobile-job-selection { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 13px; }
+.mobile-job-selection { padding: 8px 16px; border-bottom: 1px solid var(--border); }
+.job-cards input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent); }
+.job-title-button { border: 0; padding: 0; min-height: 0; background: transparent; text-align: left; justify-content: flex-start; font-size: inherit; font-weight: 700; }
+.job-controls { position: relative; }
+.job-controls-toggle { display: inline-flex; min-height: 28px; gap: 6px; margin-bottom: 6px; padding: 3px 0; border: 0; background: transparent; color: var(--muted); }
+.job-controls-toggle:hover { color: var(--text); background: var(--surface-2); }
+.job-controls.is-open > .job-controls-toggle { width: 28px; justify-content: flex-start; }
+.job-controls.is-open > .job-controls-toggle > span { display: none; }
+.job-controls > .job-filters { position: absolute; top: 100%; left: 0; width: 100%; z-index: 20; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); box-shadow: 0 8px 24px rgb(17 24 39 / 14%); }
+.job-controls > .job-filters .bulk-action-bar { margin-bottom: 0; }
+.job-filters { display: none; }
+.job-filters.is-open { display: block; }
+
+@media (max-width: 1100px) {
+  .app-shell, .app-shell.sidebar-collapsed { grid-template-columns: minmax(0, 1fr); min-height: 100dvh; }
+  .sidebar, .sidebar-collapsed .sidebar { padding: 6px 8px; gap: 0; }
+  .sidebar-head { display: none; }
+  .sidebar nav { width: 100%; gap: 2px; justify-content: space-between; }
+  .sidebar nav button, .sidebar-collapsed .sidebar nav button { display: flex; flex: 1 0 48px; width: auto; min-height: 54px; flex-direction: column; justify-content: center; gap: 5px; padding: 5px 3px; font-size: 10px; }
+  .sidebar .nav-label, .sidebar-collapsed .sidebar .nav-label { display: block; }
+  .workspace { padding: 16px; }
+  .workspace.split, .workspace.split.resizable, .workspace.split.resizable.details-collapsed { grid-template-columns: minmax(0, 1fr); }
+  .topbar { padding: 16px; gap: 14px; }
+  .topbar-actions { gap: 8px; width: 100%; flex-wrap: wrap; }
+  .topbar-actions button { min-height: 44px; }
+  .summary-strip { gap: 10px; }
+  .job-filters .filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .job-filters .filter-control, .job-filters .filter-control.search-control { min-width: 0; }
+  .job-filters .multi-filter-trigger { min-width: 0; width: 100%; }
+  .pagination-bar { gap: 12px; }
+  .pagination-bar > *, .pagination-search { min-width: 0; max-width: 100%; }
+  .pagination-bar button, .bulk-action-bar button { min-height: 44px; }
+  .pagination-bar .pagination-search-clear { min-height: 24px; }
+  .job-detail-surface .inspector-head { flex-wrap: wrap; }
+  .job-detail-surface .inspector-head > div { min-width: 0; }
+  .job-detail-surface .inspector-head h2 { font-size: 22px; line-height: 1.3; overflow-wrap: anywhere; }
+  .job-detail-surface button, .job-detail-surface .apply-link { min-height: 44px; }
+  .job-detail-surface .job-copy-button, .job-detail-surface .job-edit-button { min-width: 44px; width: 44px; }
+  .job-detail-surface input, .job-detail-surface textarea, .job-detail-surface select { font-size: 16px; }
+  .job-detail-surface pre, .job-detail-surface p, .job-detail-surface a { overflow-wrap: anywhere; }
+  .job-detail-surface pre { white-space: pre-wrap; }
+  .job-detail-surface .inspector { padding: 20px 16px 32px; }
+  .activity-notifications { max-width: calc(100vw - 24px); }
+}
+
+@media (min-width: 1101px) {
+  .workspace.split.resizable { grid-template-columns: minmax(0, 1fr) 12px minmax(320px, min(var(--inspector-width, 560px), 50%)); }
+  .workspace.job-workspace.split.resizable { grid-template-columns: minmax(0, 1fr) 12px minmax(320px, min(var(--inspector-width, 560px), 50%)); }
+  .workspace.job-workspace.split.resizable.details-collapsed { grid-template-columns: minmax(0, 1fr) 44px; }
+  .job-detail-surface { position: sticky; inset: auto; top: 18px; width: 100%; height: auto; max-height: calc(100dvh - 36px); border: 1px solid var(--border); border-radius: 6px; padding: 0; }
+  .mobile-detail-header { display: none; }
+  .job-detail-surface .inspector-collapse-button { display: inline-flex; }
+}
+.detail-feedback { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface-2); overflow-wrap: anywhere; }
+@media (max-width: 1100px) {
+  .job-detail-surface .markdown-panel pre { max-height: none; overflow: visible; }
+  .job-filters .multi-filter:nth-child(even) .multi-filter-menu { left: auto; right: 0; }
+  .job-filters .multi-filter-trigger, .job-filters .multi-filter-option, .job-filters .multi-filter-menu-actions button { min-height: 44px; }
+  .job-filters .multi-filter-menu { max-height: 60dvh; overflow-y: auto; }
+}
+
+/* The toolbar occupies its own grid row. The table, resize handle and inspector
+   start together in the next row, regardless of toolbar height or wrapping. */
+.job-controls-toggle { font-size: 12px; text-align: left; }
+.job-controls-toggle svg { flex-shrink: 0; }
+.job-controls-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.jobs-toolbar, .jobs-results { min-width: 0; }
+@media (min-width: 1101px) {
+  .jobs-table-workspace > .job-list-pane,
+  .jobs-table-workspace .jobs-view { display: contents; }
+  .jobs-table-workspace .jobs-toolbar { grid-column: 1 / -1; grid-row: 1; }
+  .jobs-table-workspace .jobs-results { grid-column: 1; grid-row: 2; }
+  .jobs-table-workspace > .split-resize-handle { grid-column: 2; grid-row: 2; }
+  .jobs-table-workspace > .job-detail-surface { grid-column: 3; grid-row: 2; }
+  .jobs-table-workspace > .inspector-rail { grid-column: 2; grid-row: 2; }
+}
+
+/* Compact desktop controls, with comfortable touch targets on small screens. */
+.job-filters .filters { gap: 8px; margin-bottom: 8px; }
+.job-filters .multi-filter summary { gap: 3px; }
+.job-filters .multi-filter summary > span { font-size: 10px; }
+.job-filters .multi-filter-trigger { padding: 5px 8px; }
+.job-filters .multi-filter-trigger span { font-size: 12px; }
+.job-filters .bulk-action-bar { gap: 8px; padding: 6px 8px; margin-bottom: 8px; font-size: 12px; }
+.job-filters .bulk-action-bar span { margin-left: 0; }
+@media (min-width: 1101px) {
+  .job-filters .filter-control { min-width: 140px; }
+  .job-filters .multi-filter-trigger { min-height: 30px; }
+  .job-filters .clear-all-filters, .job-filters .bulk-action-bar button { min-height: 28px; padding: 4px 8px; font-size: 12px; }
+}
+@media (max-width: 1100px) {
+  .job-controls-toggle { min-height: 44px; }
+  .job-controls.is-open > .job-controls-toggle { width: 44px; }
+  .job-controls > .job-filters { max-height: 65dvh; overflow-y: auto; overscroll-behavior: contain; }
+}
+
+.job-controls-pin { display: inline-flex; vertical-align: middle; min-height: 28px; width: 28px; padding: 0; margin: 0 0 6px 4px; border: 0; background: transparent; color: var(--muted); justify-content: center; }
+.job-controls-pin:hover, .job-controls-pin[aria-pressed="true"] { color: var(--accent); background: var(--surface-2); }
+@media (max-width: 1100px) { .job-controls-pin { width: 44px; min-height: 44px; } }

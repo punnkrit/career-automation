@@ -1,0 +1,37 @@
+import { useEffect, useState } from "react";
+import { ArrowRight, Cloud, ExternalLink, Github, Laptop, Plus, Search, Sparkles } from "lucide-react";
+import { DEMO, resetDemo } from "./demo-api";
+import "./onboarding.css";
+
+const REPO = "https://github.com/punnkrit/career-automation";
+export const SETUP_PROMPT = `Help me set up my own private CareerAutomation dashboard from ${REPO}. Read AGENTS.md and docs/SETUP.md. Use my own accounts and get the Sites-hosted tracker working first. Skip SerpAPI and the AI worker initially. Keep the Site owner-private, preserve existing resources on retries, and explain which sign-in steps I need to complete myself.`;
+export type Capabilities = { tracker: boolean; profile: boolean; worker_configured: boolean; search: boolean; demo?: boolean };
+type Api = <T>(path: string, init?: RequestInit) => Promise<T>;
+
+export function DemoBanner() {
+  return <div className="demo-ribbon"><span><strong>Interactive demo</strong> Fictional data. Saved sample analyses. No live AI.</span><span><a className="github-source-link" href={REPO} target="_blank" rel="noopener noreferrer"><Github size={20} aria-hidden="true" fill="currentColor" strokeWidth={1.2}/><span>GitHub source</span><ExternalLink size={16} aria-hidden="true"/></a><button onClick={() => { resetDemo(); window.location.href = "/?view=jobs"; }}>Reset samples</button></span></div>;
+}
+
+export function SetupPage({ api, capabilities, refresh, onAdd }: { api: Api; capabilities: Capabilities | null; refresh: () => void; onAdd: () => void }) {
+  const [profile, setProfile] = useState({ resume_text: "", background: "", preferences: "" });
+  const [profileLoaded, setProfileLoaded] = useState(DEMO);
+  const [message, setMessage] = useState(""); const [busy, setBusy] = useState(false); const [copied, setCopied] = useState(false);
+  useEffect(() => { if (!DEMO) api<typeof profile>("/api/setup/profile").then(value => { setProfile(value); setProfileLoaded(true); }).catch(() => setMessage("Could not load your profile. Reload this page before editing.")); }, []);
+  return <section className="setup-workspace">
+    <div className="setup-intro"><span className="eyebrow">START WITH WHAT YOU NEED</span><h2>Your tracker comes first.</h2><p>Save the roles that deserve your attention. Connect AI when you're ready.</p><button className="primary" onClick={onAdd}><Plus size={16}/>Add your first job</button></div>
+    {DEMO && <div className="setup-demo-note"><strong>This is a preview of your own setup page.</strong> The live app saves your profile privately in cloud storage. This demo does not accept personal information. The source repository is currently private while the friend-ready release is being tested.</div>}
+    <div className="setup-grid">
+      <article className="setup-card"><div className="setup-card-heading"><Cloud/><span className="ready-tag">{capabilities?.tracker ? "Ready" : "Checking"}</span></div><h3>01 / Your private dashboard</h3><p>Jobs, decisions, and networking stay available from your browser or phone. No worker, resume, or API key required.</p><button onClick={onAdd}>Start tracking <ArrowRight size={15}/></button></article>
+      <article className="setup-card"><div className="setup-card-heading"><Plus/><span className="optional-tag">Optional connection</span></div><h3>02 / Let Codex add jobs</h3><p>Choose interesting links, then let Codex retrieve the descriptions and save them through your private Site API. A persistent AI worker is not needed to save jobs.</p><pre>Read docs/PROGRAMMATIC_JOB_INGESTION.md and add these jobs: [links]</pre><p className="small-note">Configure trusted Site access with Codex. Keep credentials out of chat and source control.</p></article>
+    </div>
+    <article className="setup-card profile-card"><div className="setup-card-heading"><Sparkles/><span className={capabilities?.profile ? "ready-tag" : "optional-tag"}>{capabilities?.profile ? "Profile saved" : "Before AI analysis"}</span></div><h3>03 / Give analysis your context</h3><p>Your resume, verified background, and preferences travel with each AI operation. You can keep tracking without completing this step.</p>
+      {DEMO ? <div className="fictional-profile"><strong>Alex Morgan / fictional candidate</strong><p>Analytics and customer implementation experience. Exploring product operations and AI solutions roles. Interested in work that connects customer discovery, data, and delivery.</p></div> : <form onSubmit={async event => { event.preventDefault(); setBusy(true); setMessage(""); try { await api("/api/setup/profile", { method: "PUT", body: JSON.stringify(profile) }); setMessage("Saved privately. Future AI operations will use this context."); refresh(); } catch(e) { setMessage(e instanceof Error ? e.message : "Could not save profile"); } finally { setBusy(false); } }}>
+        <fieldset disabled={!profileLoaded || busy} className="profile-fields"><label>Resume text<textarea required rows={8} value={profile.resume_text} onChange={e => setProfile({ ...profile, resume_text: e.target.value })} placeholder="Paste the text of your resume. Review it before saving."/></label>
+        <div className="setup-grid"><label>Additional verified background<textarea rows={4} value={profile.background} onChange={e => setProfile({ ...profile, background: e.target.value })} placeholder="Projects, evidence, or constraints that are missing from your resume."/></label><label>Search preferences<textarea rows={4} value={profile.preferences} onChange={e => setProfile({ ...profile, preferences: e.target.value })} placeholder="Target roles, locations, seniority, and what matters to you."/></label></div>
+        <button className="primary" disabled={busy || !profileLoaded}>{busy ? "Saving..." : "Save my context"}</button></fieldset><p role="status">{!profileLoaded && !message ? "Loading your saved context..." : message}</p>
+      </form>}
+    </article>
+    <div className="setup-grid"><article className="setup-card"><div className="setup-card-heading"><Laptop/><span className="optional-tag">{capabilities?.worker_configured ? "Connection configured" : "Optional"}</span></div><h3>04 / Connect your AI worker</h3><p>A computer runs headless Codex using your own authenticated account. When it is off, saved work stays available and new AI tasks wait for you to retry.</p><pre>Read docs/WORKSTATION_WORKER.md and help me connect this computer.</pre><p className="small-note">The Codex badge shows reachability. A configured connection is not proof that a worker is online.</p></article><article className="setup-card"><div className="setup-card-heading"><Search/><span className={capabilities?.search ? "ready-tag" : "optional-tag"}>{capabilities?.search ? "Configured" : "Strictly optional"}</span></div><h3>05 / Search with SerpAPI</h3><p>Prefer integrated search? Connect your own SerpAPI key in the Site's server environment with Codex. You can skip this and ingest selected links instead.</p><p className="small-note">Search runs in the cloud. Its key never belongs in the browser.</p></article></div>
+    {DEMO && <article className="setup-card"><h3>Want your own workspace?</h3><p>Once you have repository access, open it in Codex and use this prompt. Sites provisions your own private dashboard; this demo does not create an account for you.</p><pre>{SETUP_PROMPT}</pre><button onClick={async () => { try { await navigator.clipboard.writeText(SETUP_PROMPT); setCopied(true); } catch { setCopied(false); } }}>{copied ? "Copied" : "Copy setup prompt"}</button></article>}
+  </section>;
+}

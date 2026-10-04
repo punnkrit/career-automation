@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": { "type": "string" },
+        "title": { "type": "string" },
+        "publisher": { "type": "string" },
+        "published_at": { "type": "string" }
+      },
+      "required": ["url", "title", "publisher", "published_at"]
+    },
+    "stakeholder": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "group": { "type": "string" },
+        "relationship": { "type": "string" }
+      },
+      "required": ["group", "relationship"]
+    }
+  },
+  "properties": {
+    "schema_version": { "type": "integer", "const": 2 },
+    "role_thesis": { "type": "string" },
+    "responsibilities": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "responsibility": { "type": "string" },
+          "detail": { "type": "string" },
+          "stakeholders": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/stakeholder" }
+          },
+          "source_urls": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["responsibility", "detail", "stakeholders", "source_urls"]
+      }
+    },
+    "success_outcomes": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "outcome": { "type": "string" },
+          "basis": { "type": "string" }
+        },
+        "required": ["outcome", "basis"]
+      }
+    },
+    "fit_thesis": { "type": "string" },
+    "proof_points": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": { "type": "string" },
+          "evidence": { "type": "string" },
+          "role_connection": { "type": "string" }
+        },
+        "required": ["label", "evidence", "role_connection"]
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gap": { "type": "string" },
+          "implication": { "type": "string" }
+        },
+        "required": ["gap", "implication"]
+      }
+    },
+    "interview_preparation": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "theme": { "type": "string" },
+          "likely_question": { "type": "string" },
+          "story_to_use": { "type": "string" },
+          "question_to_ask": { "type": "string" }
+        },
+        "required": ["theme", "likely_question", "story_to_use", "question_to_ask"]
+      }
+    },
+    "networking_targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": { "type": "string" },
+          "function": { "type": "string" },
+          "reason": { "type": "string" }
+        },
+        "required": ["target", "function", "reason"]
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    }
+  },
+  "required": ["schema_version", "role_thesis", "responsibilities", "success_outcomes", "fit_thesis", "proof_points", "gaps", "interview_preparation", "networking_targets", "sources"]
+}

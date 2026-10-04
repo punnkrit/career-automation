@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["resolution", "decision_memo"],
+  "properties": {
+    "resolution": {
+      "type": "object",
+      "required": ["status", "source_tier", "confidence", "reason", "evidence_urls", "resolved_job"],
+      "properties": {
+        "status": { "enum": ["replaced", "unavailable", "ambiguous"] },
+        "source_tier": { "enum": ["employer", "ats", "linkedin", "unverified"] },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "reason": { "type": "string" },
+        "evidence_urls": { "type": "array", "items": { "type": "string" } },
+        "resolved_job": {
+          "type": "object",
+          "required": ["title", "company", "location", "url", "description"],
+          "properties": {
+            "title": { "type": "string" },
+            "company": { "type": "string" },
+            "location": { "type": "string" },
+            "url": { "type": "string" },
+            "description": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "decision_memo": {
+      "type": "object",
+      "required": [
+        "decision",
+        "fit_tier",
+        "sponsorship_tier",
+        "lane",
+        "resume_strategy",
+        "confidence",
+        "interview_chance_reasoning",
+        "why_apply",
+        "risks",
+        "jd_evidence",
+        "profile_evidence",
+        "recommended_next_step"
+      ],
+      "properties": {
+        "decision": { "enum": ["apply_strong", "apply", "maybe", "skip", "blocked"] },
+        "fit_tier": { "enum": ["strong", "plausible", "stretch", "weak", "blocked"] },
+        "sponsorship_tier": { "enum": ["friendly", "plausible", "unknown", "high_risk", "blocked_explicit"] },
+        "lane": { "enum": ["ai_solutions", "product_ops", "bizops", "tpm_epm", "ai_product", "pmm_gtm_ai", "other"] },
+        "resume_strategy": { "enum": ["ai_solutions", "product_ops", "bizops", "tpm_epm", "ai_product", "pmm_gtm_ai"] },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "interview_chance_reasoning": { "type": "string" },
+        "why_apply": { "type": "array", "items": { "type": "string" } },
+        "risks": { "type": "array", "items": { "type": "string" } },
+        "jd_evidence": { "type": "array", "items": { "type": "string" } },
+        "profile_evidence": { "type": "array", "items": { "type": "string" } },
+        "recommended_next_step": { "enum": ["build_packet", "seek_referral", "research_company", "skip"] }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

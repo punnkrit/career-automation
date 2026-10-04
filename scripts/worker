@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+ROOT_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
+API_UNIT="career-automation-api.service"
+TUNNEL_UNIT="career-automation-tunnel.service"
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/bin:$PATH"
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/worker COMMAND [OPTIONS]
+
+Commands:
+  setup       Create/update .venv, prepare .env, and install user services
+  start       Validate configuration and start the API and tunnel
+  stop        Stop the tunnel and API
+  restart     Validate configuration and restart the API and tunnel
+  status      Show both systemd user service states
+  logs        Show the latest logs; pass -f to follow
+  doctor      Validate configuration/auth; pass --require-running for health checks
+EOF
+}
+
+die() {
+  echo "worker: $*" >&2
+  exit 1
+}
+
+python_command() {
+  if [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then
+    printf '%s' "$ROOT_DIR/.venv/bin/python"
+  elif command -v python3 >/dev/null 2>&1; then
+    command -v python3
+  else
+    return 1
+  fi
+}
+
+require_systemd() {
+  command -v systemctl >/dev/null 2>&1 || die "systemctl is unavailable; enable systemd in WSL first"
+}
+
+ensure_units() {
+  local unit_dir="$HOME/.config/systemd/user"
+  [[ -f "$unit_dir/$API_UNIT" && -f "$unit_dir/$TUNNEL_UNIT" ]] || \
+    die "worker services are not installed; run scripts/worker setup"
+}
+
+run_doctor() {
+  local doctor_python
+  doctor_python="$(python_command)" || die "Python 3 is unavailable; run scripts/worker setup"
+  (cd "$ROOT_DIR" && exec "$doctor_python" -m career_workflow.worker_doctor "$@")
+}
+
+setup_worker() {
+  local uv_command
+  uv_command="$(command -v uv 2>/dev/null || true)"
+  if [[ -z "$uv_command" ]]; then
+    command -v curl >/dev/null 2>&1 || die "uv is missing and curl is unavailable; install uv, then retry"
+    echo "Installing uv with the official Astral installer..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    uv_command="$(command -v uv 2>/dev/null || true)"
+    [[ -n "$uv_command" ]] || die "uv installation completed but uv is still not on PATH"
+  fi
+
+  if [[ ! -x "$ROOT_DIR/.venv/bin/python" ]]; then
+    "$uv_command" venv --python 3.11 "$ROOT_DIR/.venv"
+  fi
+  "$uv_command" pip install --python "$ROOT_DIR/.venv/bin/python" -r "$ROOT_DIR/requirements.txt"
+
+  if [[ ! -e "$ROOT_DIR/.env" ]]; then
+    [[ -f "$ROOT_DIR/.env.example" ]] || die ".env.example is missing"
+    cp -- "$ROOT_DIR/.env.example" "$ROOT_DIR/.env"
+    echo "Created .env from .env.example; fill in the workstation secrets before starting."
+  fi
+  chmod 600 "$ROOT_DIR/.env"
+
+  "$ROOT_DIR/scripts/install_worker_services"
+  if ! run_doctor --config-only; then
+    echo "Dependencies and user services are installed. Add this machine's missing secrets or tunnel configuration to .env, then rerun scripts/worker doctor --config-only." >&2
+    return 1
+  fi
+  echo "Worker setup is ready. Run scripts/worker start."
+}
+
+command_name="${1:-help}"
+if [[ $# -gt 0 ]]; then
+  shift
+fi
+
+case "$command_name" in
+  setup)
+    [[ $# -eq 0 ]] || die "setup does not accept options"
+    setup_worker
+    ;;
+  start)
+    [[ $# -eq 0 ]] || die "start does not accept options"
+    require_systemd
+    ensure_units
+    run_doctor --config-only
+    systemctl --user start "$API_UNIT" "$TUNNEL_UNIT"
+    echo "Worker services started. Run scripts/worker doctor --require-running to verify end to end."
+    ;;
+  stop)
+    [[ $# -eq 0 ]] || die "stop does not accept options"
+    require_systemd
+    ensure_units
+    systemctl --user stop "$TUNNEL_UNIT" "$API_UNIT"
+    ;;
+  restart)
+    [[ $# -eq 0 ]] || die "restart does not accept options"
+    require_systemd
+    ensure_units
+    run_doctor --config-only
+    systemctl --user restart "$API_UNIT" "$TUNNEL_UNIT"
+    echo "Worker services restarted."
+    ;;
+  status)
+    [[ $# -eq 0 ]] || die "status does not accept options"
+    require_systemd
+    ensure_units
+    systemctl --user --no-pager --full status "$API_UNIT" "$TUNNEL_UNIT"
+    ;;
+  logs)
+    require_systemd
+    ensure_units
+    journalctl --user --unit "$API_UNIT" --unit "$TUNNEL_UNIT" --no-pager --lines 100 "$@"
+    ;;
+  doctor)
+    run_doctor "$@"
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "headline": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "likely",
+            "unknown"
+          ]
+        },
+        "source_urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_type": {
+          "type": "string",
+          "enum": [
+            "company_reported",
+            "independently_supported",
+            "analysis",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "headline",
+        "detail",
+        "as_of",
+        "confidence",
+        "source_urls",
+        "evidence_type"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "publisher": {
+          "type": "string"
+        },
+        "published_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "url",
+        "title",
+        "publisher",
+        "published_at"
+      ]
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 3
+    },
+    "official_name": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "careers_url": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "headquarters": {
+      "type": "string"
+    },
+    "size_and_stage": {
+      "type": "string"
+    },
+    "ownership": {
+      "type": "string"
+    },
+    "business_model": {
+      "type": "string"
+    },
+    "executive_summary": {
+      "type": "string"
+    },
+    "sections": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "products_and_services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "customers_and_use_cases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "traction_and_strategy": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "market_and_competitors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "recent_developments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "culture_and_hiring": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "risks_and_unknowns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        }
+      },
+      "required": [
+        "products_and_services",
+        "customers_and_use_cases",
+        "traction_and_strategy",
+        "market_and_competitors",
+        "recent_developments",
+        "culture_and_hiring",
+        "risks_and_unknowns"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "explainer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plain_english": {
+          "type": "string"
+        },
+        "source_urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "does": {
+                "type": "string"
+              },
+              "user": {
+                "type": "string"
+              },
+              "example": {
+                "type": "string"
+              },
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "name",
+              "does",
+              "user",
+              "example",
+              "source_urls"
+            ]
+          },
+          "maxItems": 6
+        },
+        "workflow": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string"
+                  },
+                  "detail": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "label",
+                  "detail",
+                  "provider"
+                ]
+              },
+              "maxItems": 6
+            },
+            "caption": {
+              "type": "string"
+            },
+            "source_urls": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "title",
+            "steps",
+            "caption",
+            "source_urls"
+          ]
+        },
+        "customer_examples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "customer": {
+                "type": "string"
+              },
+              "problem": {
+                "type": "string"
+              },
+              "product": {
+                "type": "string"
+              },
+              "workflow": {
+                "type": "string"
+              },
+              "outcome": {
+                "type": "string"
+              },
+              "caveat": {
+                "type": "string"
+              },
+              "evidence_type": {
+                "type": "string",
+                "enum": [
+                  "company_reported",
+                  "independently_supported",
+                  "analysis",
+                  "unknown"
+                ]
+              },
+              "source_urls": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "customer",
+              "problem",
+              "product",
+              "workflow",
+              "outcome",
+              "caveat",
+              "evidence_type",
+              "source_urls"
+            ]
+          },
+          "maxItems": 2
+        },
+        "media": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "image",
+                  "demo"
+                ]
+              },
+              "url": {
+                "type": "string"
+              },
+              "source_url": {
+                "type": "string"
+              },
+              "caption": {
+                "type": "string"
+              },
+              "alt": {
+                "type": "string"
+              },
+              "as_of": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "url",
+              "source_url",
+              "caption",
+              "alt",
+              "as_of"
+            ]
+          },
+          "maxItems": 3
+        }
+      },
+      "required": [
+        "plain_english",
+        "source_urls",
+        "products",
+        "workflow",
+        "customer_examples",
+        "media"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "official_name",
+    "website",
+    "careers_url",
+    "industry",
+    "headquarters",
+    "size_and_stage",
+    "ownership",
+    "business_model",
+    "executive_summary",
+    "sections",
+    "sources",
+    "explainer"
+  ]
+}

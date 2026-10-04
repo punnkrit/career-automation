@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "heading": { "type": "string" },
+        "paragraphs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "source_urls": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["heading", "paragraphs", "source_urls"]
+    }
+  },
+  "properties": {
+    "schema_version": { "type": "integer", "const": 2 },
+    "headline": { "type": "string" },
+    "dek": { "type": "string" },
+    "lede": { "type": "string" },
+    "executive_takeaways": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "label": { "type": "string" },
+          "detail": { "type": "string" }
+        },
+        "required": ["label", "detail"]
+      }
+    },
+    "business_at_a_glance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customer": { "type": "string" },
+        "buyer": { "type": "string" },
+        "problem": { "type": "string" },
+        "product": { "type": "string" },
+        "value": { "type": "string" },
+        "growth_path": { "type": "string" },
+        "strategic_question": { "type": "string" }
+      },
+      "required": ["customer", "buyer", "problem", "product", "value", "growth_path", "strategic_question"]
+    },
+    "sections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/section" },
+      "minItems": 3,
+      "maxItems": 5
+    },
+    "closing": { "type": "string" }
+  },
+  "required": ["schema_version", "headline", "dek", "lede", "executive_takeaways", "business_at_a_glance", "sections", "closing"]
+}

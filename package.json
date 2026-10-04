@@ -1,0 +1,32 @@
+{
+  "name": "career-automation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc && vite build && node scripts/sanitize-sites-build.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "prebuild": "node scripts/prepare-local-build.mjs",
+    "build:demo": "tsc && vite build --config vite.demo.config.ts",
+    "demo": "vite --config vite.demo.config.ts"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "6.0.2",
+    "drizzle-orm": "0.45.2",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "5.9.3",
+    "vite": "8.2.2"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.62.5",
+    "@cloudflare/workers-types": "5.20261004.1",
+    "@openai/sites-vite-plugin": "0.2.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "drizzle-kit": "0.31.10",
+    "wrangler": "4.147.0"
+  }
+}
